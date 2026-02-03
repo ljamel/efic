@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cp -r src/main/webapp .vercel/output/static",
+  "outputDirectory": ".vercel/output/static"
+}
