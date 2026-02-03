@@ -1,3 +1,4 @@
 {
-  "outputDirectory": "public"
+  "buildCommand": "mkdir -p out && cp -r src/main/webapp/* out/",
+  "outputDirectory": "out"
 }
