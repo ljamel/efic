@@ -211,15 +211,210 @@ function loadGraphData() {
         nodes = LocalStorage.getAllNodes();
         relations = LocalStorage.getAllRelations();
 
+        if (nodes.length === 0 && relations.length === 0) {
+            seedDefaultInvestigationGraph();
+            nodes = LocalStorage.getAllNodes();
+            relations = LocalStorage.getAllRelations();
+            Utils.showToast('Modèle d’investigation chargé', 'info');
+        }
+
         Utils.log('Données chargées depuis localStorage:', nodes.length, 'nœuds,', relations.length, 'relations');
         updateCytoscapeGraph();
         updateNodeSelects();
+        if (cy && cy.nodes().length > 0) {
+            cy.fit(cy.elements(), 50);
+        }
     } catch (error) {
         Utils.error('Erreur lors du chargement des données:', error);
         Utils.showToast('Erreur lors du chargement des données', 'error');
     } finally {
         showLoadingSpinner(false);
     }
+}
+
+/**
+ * Ajoute un modèle d'investigation cyber par défaut
+ */
+function seedDefaultInvestigationGraph() {
+    const incident = LocalStorage.saveNode({
+        name: 'Incident Ransomware - ACME',
+        nodeType: 'INCIDENT',
+        severity: 'CRITICAL',
+        description: 'Chiffrement des serveurs de fichiers et exfiltration de données.',
+        status: 'IN_PROGRESS',
+        positionX: -50,
+        positionY: -20,
+        color: '#666'
+    });
+
+    const vuln = LocalStorage.saveNode({
+        name: 'Vulnérabilité VPN (CVE-2024-XXXX)',
+        nodeType: 'VULNERABILITY',
+        severity: 'HIGH',
+        description: 'Exploit d’accès initial via VPN non patché.',
+        status: 'OPEN',
+        positionX: -220,
+        positionY: -120,
+        color: '#666'
+    });
+
+    const attacker = LocalStorage.saveNode({
+        name: 'Groupe ShadowFox',
+        nodeType: 'ATTACKER',
+        severity: 'HIGH',
+        description: 'Groupe d’attaque connu pour ransomware double extorsion.',
+        status: 'OPEN',
+        positionX: -300,
+        positionY: 40,
+        color: '#666'
+    });
+
+    const ioc = LocalStorage.saveNode({
+        name: 'IOC - Hash b10c...f9a2',
+        nodeType: 'IOC',
+        severity: 'MEDIUM',
+        description: 'SHA256 du binaire déployé sur les hôtes.',
+        status: 'OPEN',
+        positionX: 40,
+        positionY: -120,
+        color: '#666'
+    });
+
+    const endpoint = LocalStorage.saveNode({
+        name: 'Serveur-Fichiers-01',
+        nodeType: 'ENDPOINT',
+        severity: 'HIGH',
+        description: 'Serveur impacté (partages critiques).',
+        status: 'IN_PROGRESS',
+        positionX: 180,
+        positionY: 10,
+        color: '#666'
+    });
+
+    const malware = LocalStorage.saveNode({
+        name: 'Malware - FoxCrypt',
+        nodeType: 'MALWARE',
+        severity: 'CRITICAL',
+        description: 'Ransomware chiffrant les volumes locaux et réseau.',
+        status: 'OPEN',
+        positionX: 10,
+        positionY: 80,
+        color: '#666'
+    });
+
+    const impact = LocalStorage.saveNode({
+        name: 'Impact - Arrêt Production',
+        nodeType: 'IMPACT',
+        severity: 'CRITICAL',
+        description: 'Interruption des processus métiers pendant 12h.',
+        status: 'OPEN',
+        positionX: 260,
+        positionY: 120,
+        color: '#666'
+    });
+
+    const mitigation = LocalStorage.saveNode({
+        name: 'Mitigation - Isolation réseau',
+        nodeType: 'MITIGATION',
+        severity: 'MEDIUM',
+        description: 'Segmentation d’urgence et coupure VPN.',
+        status: 'RESOLVED',
+        positionX: -80,
+        positionY: 160,
+        color: '#666'
+    });
+
+    const evidence = LocalStorage.saveNode({
+        name: 'Preuve - Logs EDR',
+        nodeType: 'EVIDENCE',
+        severity: 'LOW',
+        description: 'Alertes EDR sur exécution anormale et chiffrement.',
+        status: 'OPEN',
+        positionX: 120,
+        positionY: -220,
+        color: '#666'
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: attacker,
+        targetNode: vuln,
+        relationType: 'EXPLOITS',
+        description: 'Exploitation de la faille pour l’accès initial.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: vuln,
+        targetNode: incident,
+        relationType: 'CAUSES',
+        description: 'Vecteur initial de compromission.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: attacker,
+        targetNode: malware,
+        relationType: 'USES',
+        description: 'Déploiement du ransomware FoxCrypt.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: malware,
+        targetNode: endpoint,
+        relationType: 'TARGETS',
+        description: 'Cible principale du chiffrement.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: malware,
+        targetNode: incident,
+        relationType: 'TRIGGERED_BY',
+        description: 'Ransomware déclenche l’incident.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: ioc,
+        targetNode: malware,
+        relationType: 'RELATED_TO',
+        description: 'IOC lié au binaire malveillant.',
+        confidence: 'MEDIUM',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: evidence,
+        targetNode: incident,
+        relationType: 'RELATED_TO',
+        description: 'Preuves collectées pendant l’enquête.',
+        confidence: 'MEDIUM',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: mitigation,
+        targetNode: incident,
+        relationType: 'MITIGATES',
+        description: 'Actions de réponse pour contenir l’incident.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
+
+    LocalStorage.saveRelation({
+        sourceNode: incident,
+        targetNode: impact,
+        relationType: 'CAUSES',
+        description: 'Conséquences métiers et opérationnelles.',
+        confidence: 'HIGH',
+        confirmed: true
+    });
 }
 
 /**
