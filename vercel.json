@@ -1,48 +1,8 @@
 {
-  "version": 2,
-  "name": "detectivedex",
-  "public": true,
-  "buildCommand": "mkdir -p public && cp -r src/main/webapp/* public/ && ls -la public/",
-  "outputDirectory": "public",
-  "framework": "other",
-  "regions": ["cdg1"],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*\\.[^.]+$)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/js/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/css/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
