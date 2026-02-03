@@ -1,4 +1,4 @@
 {
-  "rootDirectory": "src/main/webapp",
-  "outputDirectory": "."
+  "buildCommand": "mkdir -p out && ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd) && if [ -d \"$ROOT/src/main/webapp\" ]; then cp -a \"$ROOT/src/main/webapp/.\" out/; elif [ -d \"$ROOT/public\" ]; then cp -a \"$ROOT/public/.\" out/; else DIR=$(find \"$ROOT\" -maxdepth 6 -type f -name index.html -print | head -n 1 | xargs -r dirname) && [ -n \"$DIR\" ] && cp -a \"$DIR/.\" out/ || (echo 'No web assets directory found.' && exit 1); fi",
+  "outputDirectory": "out"
 }
