@@ -1,4 +1,4 @@
 {
-  "buildCommand": "mkdir -p out && cp -a src/main/webapp/. out/",
+  "buildCommand": "mkdir -p out && if [ -d src/main/webapp ]; then cp -a src/main/webapp/. out/; elif [ -d public ]; then cp -a public/. out/; else echo 'No web assets directory found.' && exit 1; fi",
   "outputDirectory": "out"
 }
