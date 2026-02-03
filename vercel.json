@@ -2,9 +2,10 @@
   "version": 2,
   "name": "detectivedex",
   "public": true,
-  "buildCommand": "mkdir -p public && cp -r src/main/webapp/* public/",
+  "buildCommand": "mkdir -p public && cp -r src/main/webapp/* public/ && ls -la public/",
   "outputDirectory": "public",
-  "framework": "static",
+  "framework": "other",
+  "regions": ["cdg1"],
   "routes": [
     {
       "src": "/(.*\\.[^.]+$)",
@@ -17,15 +18,11 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/index.html",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=3600, must-revalidate"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },

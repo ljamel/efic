@@ -1,0 +1,17 @@
+{
+  "name": "detectivedex",
+  "version": "1.0.0",
+  "description": "Platform de Visualisation des Incidents de Sécurité",
+  "scripts": {
+    "build": "mkdir -p public && cp -r src/main/webapp/* public/",
+    "dev": "cd src/main/webapp && python -m http.server 8000"
+  },
+  "keywords": [
+    "security",
+    "incident",
+    "graph",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT"
+}
