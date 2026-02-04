@@ -274,18 +274,13 @@ await API.createRelation({
 
 ## Améliorations Futures
 
-- [ ] Authentification et autorisation multi-utilisateurs
+- [ ] capture d'image
 - [ ] Versioning et historique des modifications
-- [ ] Collaboration temps réel (WebSocket)
 - [ ] Intégration avec outils SIEM
 - [ ] Analyse de risque automatique
-- [ ] Génération de rapports personnalisés
+- [ ] Plans réseau, ordinateur, serveur, ip, serveur ou plans simplifier
 - [ ] Support de multi-graphes/projets
 - [ ] Plugins et extensibilité
-
-## Licence
-
-MIT
 
 ## Support
 

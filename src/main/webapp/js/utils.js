@@ -1,6 +1,7 @@
 /**
  * Utility Functions Module
  * Common utility functions used across the application
+ * By ingenius via github ljamel
  */
 
 const Utils = {

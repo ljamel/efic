@@ -1,5 +1,6 @@
 /**
  * Module API - Gère la communication avec le backend REST
+ * ingenius github ljamel
  */
 
 const API_BASE_URL = 'http://localhost:8080/detectivedex/api';
