@@ -559,7 +559,6 @@ body {
     position: absolute;
     bottom: var(--spacing-lg);
     left: var(--spacing-lg);
-    background: rgba(15, 23, 32, 0.95);
     padding: var(--spacing-md);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
@@ -785,6 +784,29 @@ body {
 .footer a:hover {
     opacity: 1;
     text-shadow: 0 0 6px var(--color-primary);
+}
+
+/* D3FEND Tooltip (optional) */
+.d3fend-tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: rgba(6, 10, 18, 0.9);
+    color: #e2e8f0;
+    border: 1px solid rgba(45, 212, 191, 0.45);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.d3fend-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Adjust body to account for footer */

@@ -188,7 +188,8 @@ const Utils = {
             IMPACT: '✶',
             MITIGATION: '⛉',
             EVIDENCE: '▣',
-            ACTOR: '◯'
+            ACTOR: '◯',
+            DEFENSIVE_TECHNIQUE: '🛡️'
         };
         return iconMap[nodeType] || '•';
     },

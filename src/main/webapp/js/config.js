@@ -43,6 +43,14 @@ const AppConfig = {
                 }
             },
             {
+                selector: '.d3fend',
+                style: {
+                    'background-color': '#2dd4bf',
+                    'border-color': '#2dd4bf',
+                    'text-outline-color': '#0b1118'
+                }
+            },
+            {
                 selector: 'node:selected',
                 style: {
                     'border-width': 4,
@@ -149,7 +157,8 @@ const AppConfig = {
         IMPACT: { label: 'Impact', icon: 'fa-chart-line' },
         MITIGATION: { label: 'Mitigation', icon: 'fa-shield-alt' },
         EVIDENCE: { label: 'Preuve', icon: 'fa-file-contract' },
-        ACTOR: { label: 'Acteur', icon: 'fa-user' }
+        ACTOR: { label: 'Acteur', icon: 'fa-user' },
+        DEFENSIVE_TECHNIQUE: { label: 'Defensive Technique (D3FEND)', icon: 'fa-shield' }
     },
     
     // Relation Type Configuration
@@ -161,7 +170,58 @@ const AppConfig = {
         MITIGATES: { label: 'Atténue', color: '#27ae60' },
         DEPENDS_ON: { label: 'Dépend de', color: '#f39c12' },
         TARGETS: { label: 'Cible', color: '#c0392b' },
-        USES: { label: 'Utilise', color: '#16a085' }
+        USES: { label: 'Utilise', color: '#16a085' },
+        DETECTS: { label: 'Détecte', color: '#2dd4bf' },
+        PREVENTS: { label: 'Prévient', color: '#22c55e' },
+        RESPONDS_TO: { label: 'Répond à', color: '#38bdf8' },
+        PROTECTS: { label: 'Protège', color: '#a78bfa' },
+        SUPPORTS: { label: 'Soutient', color: '#94a3b8' }
+    },
+
+    // MITRE D3FEND (optional)
+    d3fend: {
+        enabled: true,
+        nodeType: 'DEFENSIVE_TECHNIQUE',
+        color: '#2dd4bf',
+        icon: '🛡️',
+        categories: ['Detection', 'Prevention', 'Response'],
+        techniques: {
+            'D3-EDR': {
+                d3fend_id: 'D3-EDR',
+                name: 'Endpoint Detection and Response',
+                category: 'Detection',
+                description: 'Surveillance et détection des activités malveillantes sur les endpoints.',
+                related_attack_ids: ['T1059']
+            },
+            'D3-MDE': {
+                d3fend_id: 'D3-MDE',
+                name: 'Malware Detection',
+                category: 'Detection',
+                description: 'Détection de logiciels malveillants par analyse comportementale et signatures.',
+                related_attack_ids: ['T1204']
+            },
+            'D3-NDS': {
+                d3fend_id: 'D3-NDS',
+                name: 'Network Traffic Segmentation',
+                category: 'Prevention',
+                description: 'Segmentation du trafic pour limiter la propagation latérale.',
+                related_attack_ids: ['TA0008']
+            },
+            'D3-IOC': {
+                d3fend_id: 'D3-IOC',
+                name: 'Indicator of Compromise Analysis',
+                category: 'Detection',
+                description: 'Analyse d’IOC pour détecter des compromissions actives.',
+                related_attack_ids: ['T1070']
+            },
+            'D3-IR': {
+                d3fend_id: 'D3-IR',
+                name: 'Incident Response',
+                category: 'Response',
+                description: 'Processus de réponse pour contenir et éradiquer un incident.',
+                related_attack_ids: ['TA0001']
+            }
+        }
     },
     
     // UI Configuration

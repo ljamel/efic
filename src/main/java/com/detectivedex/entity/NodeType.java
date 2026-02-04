@@ -15,7 +15,8 @@ public enum NodeType {
     IMPACT("Impact"),
     MITIGATION("Mitigation"),
     EVIDENCE("Preuve"),
-    ACTOR("Acteur");
+    ACTOR("Acteur"),
+    DEFENSIVE_TECHNIQUE("Defensive Technique (D3FEND)");
 
     private final String label;
 

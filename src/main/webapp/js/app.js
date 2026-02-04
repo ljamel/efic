@@ -8,11 +8,13 @@ let selectedNode = null;
 let selectedNodes = [];
 let nodes = [];
 let relations = [];
+let d3fendTooltip = null;
 
 // Initialisation au chargement du document
 document.addEventListener('DOMContentLoaded', () => {
     initializeCytoscape();
     attachEventListeners();
+    initializeD3fendFeature();
     loadGraphData();
 });
 
@@ -82,6 +84,90 @@ function initializeCytoscape() {
             cy.fit();
         }
     }, 100);
+}
+
+/**
+ * Initialise la fonctionnalité D3FEND (optionnelle)
+ */
+function initializeD3fendFeature() {
+    if (!isD3fendEnabled()) return;
+    addD3fendSelectOptions();
+    initD3fendTooltips();
+}
+
+function isD3fendEnabled() {
+    return typeof D3FEND !== 'undefined' && D3FEND.isEnabled();
+}
+
+function addD3fendSelectOptions() {
+    const nodeTypeSelect = document.getElementById('nodeType');
+    if (nodeTypeSelect && !nodeTypeSelect.querySelector('option[value="DEFENSIVE_TECHNIQUE"]')) {
+        const option = document.createElement('option');
+        option.value = 'DEFENSIVE_TECHNIQUE';
+        option.textContent = 'Defensive Technique (D3FEND)';
+        nodeTypeSelect.appendChild(option);
+    }
+
+    const relationTypeSelect = document.getElementById('relationType');
+    if (relationTypeSelect) {
+        const extraRelations = [
+            { value: 'DETECTS', label: 'Détecte' },
+            { value: 'PREVENTS', label: 'Prévient' },
+            { value: 'RESPONDS_TO', label: 'Répond à' },
+            { value: 'PROTECTS', label: 'Protège' },
+            { value: 'SUPPORTS', label: 'Soutient' }
+        ];
+
+        extraRelations.forEach(relation => {
+            if (!relationTypeSelect.querySelector(`option[value="${relation.value}"]`)) {
+                const option = document.createElement('option');
+                option.value = relation.value;
+                option.textContent = relation.label;
+                relationTypeSelect.appendChild(option);
+            }
+        });
+    }
+}
+
+function initD3fendTooltips() {
+    if (!cy || d3fendTooltip) return;
+    d3fendTooltip = document.createElement('div');
+    d3fendTooltip.className = 'd3fend-tooltip';
+    document.body.appendChild(d3fendTooltip);
+
+    cy.on('mouseover', 'node', (evt) => {
+        const nodeData = evt.target.data();
+        if (!D3FEND.isD3fendNode(nodeData)) return;
+        const tooltipText = D3FEND.getTooltipText(nodeData);
+        if (!tooltipText) return;
+
+        d3fendTooltip.textContent = tooltipText;
+        positionD3fendTooltip(evt);
+        d3fendTooltip.classList.add('is-visible');
+    });
+
+    cy.on('mouseout', 'node', () => {
+        if (d3fendTooltip) {
+            d3fendTooltip.classList.remove('is-visible');
+        }
+    });
+
+    cy.on('tap', () => {
+        if (d3fendTooltip) {
+            d3fendTooltip.classList.remove('is-visible');
+        }
+    });
+}
+
+function positionD3fendTooltip(evt) {
+    if (!d3fendTooltip || !cy) return;
+    const containerRect = cy.container().getBoundingClientRect();
+    const x = containerRect.left + evt.renderedPosition.x + 12;
+    const y = containerRect.top + evt.renderedPosition.y + 12;
+    const maxX = window.innerWidth - 10;
+    const maxY = window.innerHeight - 10;
+    d3fendTooltip.style.left = `${Math.min(x, maxX)}px`;
+    d3fendTooltip.style.top = `${Math.min(y, maxY)}px`;
 }
 
 /**
@@ -439,6 +525,112 @@ function seedDefaultInvestigationGraph() {
         confidence: 'HIGH',
         confirmed: true
     });
+
+    if (isD3fendEnabled()) {
+        const d3Edr = LocalStorage.saveNode(D3FEND.buildTechniqueNode(
+            AppConfig.d3fend.techniques['D3-EDR'],
+            { x: 320, y: -220 }
+        ));
+        const d3Mde = LocalStorage.saveNode(D3FEND.buildTechniqueNode(
+            AppConfig.d3fend.techniques['D3-MDE'],
+            { x: 260, y: -120 }
+        ));
+        const d3Nds = LocalStorage.saveNode(D3FEND.buildTechniqueNode(
+            AppConfig.d3fend.techniques['D3-NDS'],
+            { x: -220, y: 220 }
+        ));
+        const d3Ioc = LocalStorage.saveNode(D3FEND.buildTechniqueNode(
+            AppConfig.d3fend.techniques['D3-IOC'],
+            { x: 140, y: -180 }
+        ));
+        const d3Ir = LocalStorage.saveNode(D3FEND.buildTechniqueNode(
+            AppConfig.d3fend.techniques['D3-IR'],
+            { x: 40, y: 220 }
+        ));
+
+        const lateralMovement = LocalStorage.saveNode({
+            name: 'Mouvement latéral',
+            nodeType: 'INCIDENT',
+            severity: 'MEDIUM',
+            description: 'Propagation latérale entre segments du réseau.',
+            status: 'OPEN',
+            positionX: -180,
+            positionY: 260,
+            color: '#666'
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: evidence,
+            targetNode: malware,
+            relationType: 'DETECTS',
+            description: 'Détection via logs EDR.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: ioc,
+            targetNode: d3Ioc,
+            relationType: 'SUPPORTS',
+            description: 'IOC utilisé pour l’analyse et la détection.',
+            confidence: 'MEDIUM',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: mitigation,
+            targetNode: lateralMovement,
+            relationType: 'PREVENTS',
+            description: 'Segmentation limite le mouvement latéral.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: d3Edr,
+            targetNode: evidence,
+            relationType: 'DETECTS',
+            description: 'EDR détecte les activités malveillantes.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: d3Mde,
+            targetNode: malware,
+            relationType: 'DETECTS',
+            description: 'Détection de malware par analyse comportementale.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: d3Nds,
+            targetNode: lateralMovement,
+            relationType: 'PREVENTS',
+            description: 'Segmentation réseau empêche la propagation latérale.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: d3Nds,
+            targetNode: incident,
+            relationType: 'MITIGATES',
+            description: 'Isolation réseau atténue l\'impact du ransomware.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+
+        LocalStorage.saveRelation({
+            sourceNode: d3Ir,
+            targetNode: incident,
+            relationType: 'RESPONDS_TO',
+            description: 'Processus IR pour répondre à l\'incident.',
+            confidence: 'HIGH',
+            confirmed: true
+        });
+    }
 }
 
 /**
@@ -456,7 +648,8 @@ function updateCytoscapeGraph() {
         position: {
             x: node.positionX || 0,
             y: node.positionY || 0
-        }
+        },
+        classes: isD3fendEnabled() && D3FEND.isD3fendNode(node) ? 'd3fend' : ''
     }));
 
     // Créer un Set des IDs de nœuds existants pour vérification rapide
@@ -520,7 +713,11 @@ function updateCytoscapeGraph() {
     // Appliquer les couleurs basées sur la sévérité
     nodes.forEach(node => {
         const cyNode = cy.getElementById(`node-${node.id}`);
-        cyNode.style('background-color', Utils.getSeverityColor(node.severity) || node.color);
+        if (isD3fendEnabled() && D3FEND.isD3fendNode(node)) {
+            cyNode.style('background-color', AppConfig.d3fend.color || node.color);
+        } else {
+            cyNode.style('background-color', Utils.getSeverityColor(node.severity) || node.color);
+        }
     });
 }
 
@@ -563,6 +760,12 @@ function showNodeDetails(nodeData) {
             <label>Type</label>
             <div>${Utils.getNodeTypeIcon(nodeData.nodeType)} ${Utils.getNodeTypeLabel(nodeData.nodeType)}</div>
         </div>
+        ${isD3fendEnabled() && nodeData.d3fend_id ? `
+        <div class="property-item">
+            <label>D3FEND</label>
+            <div>${nodeData.d3fend_id} — ${nodeData.name}</div>
+        </div>
+        ` : ''}
         <div class="property-item">
             <label>Sévérité</label>
             <span class="badge badge-${nodeData.severity.toLowerCase()}">
@@ -835,10 +1038,52 @@ function addTimelineEvent(nodeId) {
 }
 
 /**
- * Attache les écouteurs d'événements
+ * Crée un nouveau projet vide
+ */
+function createNewProject() {
+    if (!confirm('⚠️ Êtes-vous sûr de vouloir créer un nouveau projet ?\n\nToutes les données actuelles seront supprimées.\n\nAssurez-vous d\'avoir exporté vos données si nécessaire.')) {
+        return;
+    }
+
+    try {
+        // Vider localStorage
+        localStorage.removeItem(LocalStorage.NODES_KEY);
+        localStorage.removeItem(LocalStorage.RELATIONS_KEY);
+        localStorage.removeItem(LocalStorage.EVENTS_KEY);
+        localStorage.removeItem(LocalStorage.NODE_ID_COUNTER);
+        localStorage.removeItem(LocalStorage.RELATION_ID_COUNTER);
+        localStorage.removeItem(LocalStorage.EVENT_ID_COUNTER);
+
+        // Réinitialiser les variables globales
+        nodes = [];
+        relations = [];
+        selectedNode = null;
+        selectedNodes = [];
+
+        // Vider le graphe
+        if (cy) {
+            cy.elements().remove();
+        }
+
+        // Fermer les panneaux
+        document.getElementById('sidePanel').classList.remove('active');
+        document.getElementById('timelineContainer').classList.remove('active');
+
+        Utils.showToast('Nouveau projet créé avec succès', 'success');
+        Utils.log('Nouveau projet créé - localStorage vidé');
+    } catch (error) {
+        Utils.error('Erreur lors de la création du nouveau projet:', error);
+        Utils.showToast('Erreur lors de la création du nouveau projet', 'error');
+    }
+}
+
+/**
+ * Attache les écouteurs d\'événements
  */
 function attachEventListeners() {
     // Boutons principaux
+    document.getElementById('btnNewProject').addEventListener('click', createNewProject);
+    
     document.getElementById('btnAddNode').addEventListener('click', () => {
         document.getElementById('modalAddNode').classList.add('active');
     });

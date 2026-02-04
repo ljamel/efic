@@ -274,8 +274,10 @@ await API.createRelation({
 
 ## Améliorations Futures
 
+- [ ] MITRE ATT&CK
 - [ ] capture d'image
-- [ ] Versioning et historique des modifications et ajouter de nouveau projet et effacer
+- [ ] Versioning et historique des modifications
+- [ ] ajouter de nouveau projet et effacer
 - [ ] Intégration avec outils SIEM
 - [ ] Analyse de risque automatique
 - [ ] Plans réseau, ordinateur, serveur, ip, serveur ou plans simplifier
