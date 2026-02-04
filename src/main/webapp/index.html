@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DetectiveDex - Visualisation des Incidents de Sécurité</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link href="css/main.css?v=20260204" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="header">
+            <h1>
+                <i class="fas fa-network-wired"></i> DetectiveDex
+                <small>
+                    Plateforme de Visualisation des Incidents de Sécurité
+                </small>
+            </h1>
+        </div>
+
+    <div class="toolbar">
+        <div class="btn-group-custom">
+            <button class="btn btn-primary" id="btnAddNode">
+                <i class="fas fa-plus"></i> Ajouter Nœud
+            </button>
+            <button class="btn btn-info" id="btnAddRelation">
+                <i class="fas fa-link"></i> Ajouter Relation
+            </button>
+            <button class="btn btn-success" id="btnLayout">
+                <i class="fas fa-sitemap"></i> Organiser
+            </button>
+        </div>
+
+        <div class="btn-group-custom">
+            <button class="btn btn-warning" id="btnTimeline">
+                <i class="fas fa-clock"></i> Timeline
+            </button>
+            <button class="btn btn-info" id="btnStatistics">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </button>
+        </div>
+
+        <div class="btn-group-custom">
+            <button class="btn btn-primary" id="btnExportJSON">
+                <i class="fas fa-file-export"></i> Export JSON
+            </button>
+            <button class="btn btn-primary" id="btnExportHTML">
+                <i class="fas fa-file-html5"></i> Export HTML
+            </button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher un nœud...">
+            <button class="btn btn-primary" id="btnSearch">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <div id="cy"></div>
+
+    <div class="legend">
+        <div class="legend-title">
+            <i class="fas fa-layer-group"></i> Types de Sévérité
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-color--critical"></div>
+            <span>Critique</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-color--high"></div>
+            <span>Haut</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-color--medium"></div>
+            <span>Moyen</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-color--low"></div>
+            <span>Bas</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-color--info"></div>
+            <span>Information</span>
+        </div>
+    </div>
+
+    <!-- Timeline Container -->
+    <div class="timeline-container" id="timelineContainer">
+        <div class="timeline-header">
+            <span>Timeline des Événements</span>
+            <button class="modal-close" id="btnCloseTimeline">×</button>
+        </div>
+        <div class="timeline-content" id="timelineContent"></div>
+    </div>
+
+    <!-- Side Panel pour détails du nœud -->
+    <div class="side-panel" id="sidePanel">
+        <div class="side-panel-header">
+            Détails du Nœud
+            <button class="modal-close" id="btnCloseSidePanel">×</button>
+        </div>
+        <div class="side-panel-content" id="sidePanelContent"></div>
+    </div>
+
+    <!-- Modal pour ajouter un nœud -->
+    <div class="modal" id="modalAddNode">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Ajouter un nouveau nœud</span>
+                <button class="modal-close" id="btnCloseAddNode">×</button>
+            </div>
+            <form id="formAddNode">
+                <div class="form-group">
+                    <label for="nodeeName">Nom *</label>
+                    <input type="text" id="nodeeName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nodeType">Type *</label>
+                    <select id="nodeType" required>
+                        <option value="BUG">Bug</option>
+                        <option value="VULNERABILITY">Vulnérabilité</option>
+                        <option value="INCIDENT">Incident</option>
+                        <option value="ARTIFACT">Artefact</option>
+                        <option value="ENDPOINT">Endpoint</option>
+                        <option value="ATTACKER">Attaquant</option>
+                        <option value="MALWARE">Malware</option>
+                        <option value="IOC">IOC</option>
+                        <option value="IMPACT">Impact</option>
+                        <option value="MITIGATION">Mitigation</option>
+                        <option value="EVIDENCE">Preuve</option>
+                        <option value="ACTOR">Acteur</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nodeSeverity">Sévérité *</label>
+                    <select id="nodeSeverity" required>
+                        <option value="CRITICAL">Critique</option>
+                        <option value="HIGH">Haut</option>
+                        <option value="MEDIUM">Moyen</option>
+                        <option value="LOW">Bas</option>
+                        <option value="INFO">Information</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nodeDescription">Description</label>
+                    <textarea id="nodeDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="nodeStatus">Statut</label>
+                    <select id="nodeStatus">
+                        <option value="OPEN">Ouvert</option>
+                        <option value="IN_PROGRESS">En cours</option>
+                        <option value="RESOLVED">Résolu</option>
+                        <option value="CLOSED">Fermé</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mt-lg">
+                    <i class="fas fa-check"></i> Créer Nœud
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter une relation -->
+    <div class="modal" id="modalAddRelation">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Ajouter une relation</span>
+                <button class="modal-close" id="btnCloseAddRelation">×</button>
+            </div>
+            <form id="formAddRelation">
+                <div class="form-group">
+                    <label for="relationSource">Nœud Source *</label>
+                    <select id="relationSource" required>
+                        <option value="">Sélectionner un nœud...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationTarget">Nœud Cible *</label>
+                    <select id="relationTarget" required>
+                        <option value="">Sélectionner un nœud...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationType">Type de Relation *</label>
+                    <select id="relationType" required>
+                        <option value="CAUSES">Cause</option>
+                        <option value="RELATED_TO">Lié à</option>
+                        <option value="EXPLOITS">Exploite</option>
+                        <option value="TRIGGERED_BY">Déclenché par</option>
+                        <option value="MITIGATES">Atténue</option>
+                        <option value="DEPENDS_ON">Dépend de</option>
+                        <option value="TARGETS">Cible</option>
+                        <option value="USES">Utilise</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationDescription">Description</label>
+                    <textarea id="relationDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationConfidence">Confiance</label>
+                    <select id="relationConfidence">
+                        <option value="HIGH">Haute</option>
+                        <option value="MEDIUM">Moyenne</option>
+                        <option value="LOW">Basse</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mt-lg">
+                    <i class="fas fa-check"></i> Créer Relation
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour statistiques -->
+    <div class="modal" id="modalStatistics">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Statistiques Globales</span>
+                <button class="modal-close" id="btnCloseStatistics">×</button>
+            </div>
+            <div id="statisticsContent"></div>
+        </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div class="loading" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p class="text-center mt-sm">Chargement...</p>
+    </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Developed by <a href="https://progfacil.fr/" target="_blank">progfacil.fr</a></p>
+    </footer>
+
+    <!-- Application Scripts -->
+    <!-- By djamal lamri alias ingenius github https://github.com/ljamel/efic -->
+    <script src="js/config.js?v=20260204"></script>
+    <script src="js/utils.js?v=20260204"></script>
+    <script src="js/api.js?v=20260204"></script>
+    <script src="js/app.js?v=20260204"></script>
+</body>
+</html>

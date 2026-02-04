@@ -92,7 +92,7 @@ body {
 }
 
 .container-fluid {
-    height: 100vh;
+    height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
 }
@@ -234,12 +234,19 @@ body {
 #cy {
     flex: 1;
     width: 100%;
+    max-height: calc(100vh - 200px);
+    overflow: hidden;
     background-color: #0b1118;
     background-image:
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 26px 26px;
     position: relative;
+}
+
+#cy canvas {
+    max-height: 100% !important;
+    height: auto !important;
 }
 
 /* ===================================
@@ -738,5 +745,66 @@ body {
     .btn {
         padding: 6px 12px;
         font-size: 12px;
+    }
+}
+
+/* Footer Styling */
+.footer {
+    position: fixed;
+    bottom: 0px;
+    left: 10px;
+    background: rgba(7, 9, 20, 0.7);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.footer:hover {
+    background: rgba(7, 9, 20, 0.85);
+    border-color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.footer p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 400;
+}
+
+.footer a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.footer a:hover {
+    opacity: 1;
+    text-shadow: 0 0 6px var(--color-primary);
+}
+
+/* Adjust body to account for footer */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        font-size: 10px;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer {
+        font-size: 9px;
+        padding: 4px 8px;
+        bottom: 5px;
+        left: 5px;
     }
 }

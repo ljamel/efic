@@ -33,7 +33,15 @@ function initializeCytoscape() {
             refresh: 20,
             fit: true,
             padding: 30
-        }
+        },
+        minZoom: 0.1,
+        maxZoom: 3,
+        wheelSensitivity: 0.2,
+        pixelRatio: 1,
+        motionBlur: false,
+        textureOnViewport: false,
+        hideEdgesOnViewport: true,
+        hideLabelsOnViewport: false
     });
 
     // Événements Cytoscape
@@ -58,6 +66,22 @@ function initializeCytoscape() {
             document.getElementById('sidePanel').classList.remove('active');
         }
     });
+
+    // Forcer le redimensionnement approprié du canvas
+    window.addEventListener('resize', () => {
+        if (cy) {
+            cy.resize();
+            cy.fit();
+        }
+    });
+
+    // Limiter la taille du canvas à la création
+    setTimeout(() => {
+        if (cy) {
+            cy.resize();
+            cy.fit();
+        }
+    }, 100);
 }
 
 /**
@@ -436,6 +460,7 @@ function updateCytoscapeGraph() {
     }));
 
     // Créer un Set des IDs de nœuds existants pour vérification rapide
+    // QnkgZGphbWFsIGxhbXJpIGFsaWFzIGluZ2VuaXVzIGdpdGh1YiBodHRwczovL2dpdGh1Yi5jb20vbGphbWVsL2VmaWM=
     const nodeIds = new Set(nodes.map(n => n.id));
     Utils.log('Node IDs disponibles:', Array.from(nodeIds));
 

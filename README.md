@@ -275,7 +275,7 @@ await API.createRelation({
 ## Améliorations Futures
 
 - [ ] capture d'image
-- [ ] Versioning et historique des modifications
+- [ ] Versioning et historique des modifications et ajouter de nouveau projet et effacer
 - [ ] Intégration avec outils SIEM
 - [ ] Analyse de risque automatique
 - [ ] Plans réseau, ordinateur, serveur, ip, serveur ou plans simplifier

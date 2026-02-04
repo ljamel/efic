@@ -2,62 +2,7 @@
 .idea/
 .vscode/
 *.swp
-*.swo
-*~
 .DS_Store
-*.iml
 
 # Build
 target/
-build/
-dist/
-*.class
-*.jar
-*.war
-*.ear
-*.zip
-
-# Maven
-.m2/
-pom.xml.tag
-pom.xml.releaseBackup
-release.properties
-.flattened-pom.xml
-
-# Gradle
-.gradle/
-*.gradle
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-.h2.db
-
-# Logs
-logs/
-*.log
-*.log.*
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Node (if used)
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# OS
-Thumbs.db
-.DS_Store
-
-# Exports
-export.json
-*.html
-
-# Temp
-*.tmp
-*.temp
-/tmp
